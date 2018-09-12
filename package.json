@@ -1,0 +1,17 @@
+{
+  "name": "brother-ql",
+  "version": "1.0.0",
+  "description": "Library for interfacing with Brother QL series label printers",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ryan Petschek",
+  "license": "MIT",
+  "dependencies": {
+    "@types/node": "^10.9.4",
+    "@types/usb": "^1.1.6",
+    "canvas": "^2.0.0-alpha.14",
+    "usb": "^1.3.3"
+  }
+}
