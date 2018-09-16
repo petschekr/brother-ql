@@ -259,7 +259,7 @@ class Printer {
             }));
         });
     }
-    printRawImageBuffer(render, width) {
+    rawImageToRasterLines(render, width) {
         return __awaiter(this, void 0, void 0, function* () {
             const stride = width * 4;
             let renderLineCount = render.length / stride;
@@ -285,7 +285,7 @@ class Printer {
                 }
                 lines.push(line);
             }
-            return this.print(lines);
+            return lines;
         });
     }
     useFont(name, path) {
@@ -294,7 +294,7 @@ class Printer {
         }
         this.font = name;
     }
-    printText(primary, secondary) {
+    rasterizeText(primary, secondary) {
         return __awaiter(this, void 0, void 0, function* () {
             let status = yield this.getStatus();
             let width = 0;
@@ -357,9 +357,8 @@ class Printer {
                 }
                 catch (_a) { }
                 yield fs.promises.writeFile("debug.png", canvas.toBuffer());
-                return this.getStatus();
             }
-            return this.printRawImageBuffer(canvas.toBuffer("raw"), canvas.width);
+            return this.rawImageToRasterLines(canvas.toBuffer("raw"), canvas.width);
         });
     }
 }

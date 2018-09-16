@@ -5,7 +5,9 @@ import * as BrotherQL from "../index";
 	await printer.init();
 
 	printer.useFont("Chicago", __dirname + "/Chicago.ttf");
-	console.log(await printer.printText("Ryan Petschek", "Georgia Institute of Technology"));
+	await printer.print(await printer.rasterizeText("Ryan Petschek", "Georgia Institute of Technology"));
+	await printer.print(await printer.rasterizeText("Ryan Petschek"));
+	await printer.print(await printer.rasterizeText("Jordan Harvey-Morgan", "HackGT"));
 
 	process.exit(0);
 })()

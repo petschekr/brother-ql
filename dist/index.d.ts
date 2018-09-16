@@ -37,8 +37,8 @@ export declare class Printer {
     private transfer;
     getStatus(): Promise<Status.Response>;
     print(rasterLines: Buffer[], status?: Status.Response): Promise<Status.Response>;
-    printRawImageBuffer(render: Buffer, width: number): Promise<Status.Response>;
+    rawImageToRasterLines(render: Buffer, width: number): Promise<Buffer[]>;
     private font;
     useFont(name: string, path?: string): void;
-    printText(primary: string, secondary?: string): Promise<Status.Response>;
+    rasterizeText(primary: string, secondary?: string): Promise<Buffer[]>;
 }

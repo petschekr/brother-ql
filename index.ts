@@ -273,7 +273,7 @@ export class Printer {
 		});
 	}
 
-	async printRawImageBuffer(render: Buffer, width: number): Promise<Status.Response> {
+	async rawImageToRasterLines(render: Buffer, width: number): Promise<Buffer[]> {
 		const stride = width * 4;
 		let renderLineCount = render.length / stride;
 
@@ -300,7 +300,7 @@ export class Printer {
 			lines.push(line);
 		}
 
-		return this.print(lines);
+		return lines;
 	}
 
 	private font: string = "Arial";
@@ -311,7 +311,7 @@ export class Printer {
 		this.font = name;
 	}
 
-	async printText(primary: string, secondary?: string): Promise<Status.Response> {
+	async rasterizeText(primary: string, secondary?: string): Promise<Buffer[]> {
 		let status = await this.getStatus();
 		let width = 0;
 		let length = 750; // Default
@@ -376,9 +376,8 @@ export class Printer {
 				await fs.promises.unlink("debug.png");
 			} catch {}
 			await fs.promises.writeFile("debug.png", canvas.toBuffer());
-			return this.getStatus();
 		}
 
-		return this.printRawImageBuffer(canvas.toBuffer("raw"), canvas.width);
+		return this.rawImageToRasterLines(canvas.toBuffer("raw"), canvas.width);
 	}
 }
