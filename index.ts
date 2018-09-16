@@ -9,6 +9,7 @@ interface CustomCanvas {
 const Canvas: {
 	createCanvas(width: number, height: number): HTMLCanvasElement & CustomCanvas;
 	registerFont(path: string, config: { family: string; weight?: string | number; style?: string }): void;
+	loadImage(path: string): Promise<ImageBitmap>;
 } = require("canvas");
 
 export enum MediaType {
@@ -311,9 +312,10 @@ export class Printer {
 		this.font = name;
 	}
 
-	async rasterizeText(primary: string, secondary?: string): Promise<Buffer[]> {
+	async rasterizeText(primary: string, secondary?: string, secondRowImagePath?: string): Promise<Buffer[]> {
 		let status = await this.getStatus();
 		let width = 0;
+		let secondaryWidth = 0;
 		let length = 750; // Default
 
 		if (status.media.type === MediaType.ContinuousTape) {
@@ -325,6 +327,10 @@ export class Printer {
 			if (status.media.width === 12) {
 				// 12mm label seems to need this for some reason
 				width += 10;
+				// 12mm labels have a second label below the primary that can actually be used
+				if (secondRowImagePath) {
+					secondaryWidth = 170;
+				}
 			}
 		}
 		if (status.media.type == MediaType.DieCutLabels) {
@@ -334,7 +340,7 @@ export class Printer {
 			width = mediaInfo.dotsPrintable[0] + mediaInfo.rightMargin;
 			length = mediaInfo.dotsPrintable[1];
 		}
-		const canvas = Canvas.createCanvas(length, width);
+		const canvas = Canvas.createCanvas(length, width + secondaryWidth);
 		const ctx = canvas.getContext("2d")!;
 		ctx.globalCompositeOperation = "luminosity";
 		ctx.textAlign = "center";
@@ -369,6 +375,21 @@ export class Printer {
 		else {
 			ctx.font = `${primaryFontSize}px "${this.font}"`;
 			ctx.fillText(primary, length / 2, width / 2);
+		}
+
+		if (secondRowImagePath && status.media.width === 12) {
+			// Draw image on second label tape
+			const image = await Canvas.loadImage(secondRowImagePath);
+			const topMargin = 15;
+
+			const ratio = image.width / image.height;
+			let newWidth = length;
+			let newHeight = newWidth / ratio;
+			if (newHeight > secondaryWidth - topMargin) {
+				newHeight = secondaryWidth - topMargin;
+				newWidth = newHeight * ratio;
+			}
+			ctx.drawImage(image, (length - newWidth) / 2, width + topMargin, newWidth, newHeight);
 		}
 
 		if (this.debugMode) {

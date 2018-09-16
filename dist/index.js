@@ -294,10 +294,11 @@ class Printer {
         }
         this.font = name;
     }
-    rasterizeText(primary, secondary) {
+    rasterizeText(primary, secondary, secondRowImagePath) {
         return __awaiter(this, void 0, void 0, function* () {
             let status = yield this.getStatus();
             let width = 0;
+            let secondaryWidth = 0;
             let length = 750; // Default
             if (status.media.type === MediaType.ContinuousTape) {
                 let mediaInfo = constants.Labels[status.media.width.toString()];
@@ -307,6 +308,10 @@ class Printer {
                 if (status.media.width === 12) {
                     // 12mm label seems to need this for some reason
                     width += 10;
+                    // 12mm labels have a second label below the primary that can actually be used
+                    if (secondRowImagePath) {
+                        secondaryWidth = 170;
+                    }
                 }
             }
             if (status.media.type == MediaType.DieCutLabels) {
@@ -316,7 +321,7 @@ class Printer {
                 width = mediaInfo.dotsPrintable[0] + mediaInfo.rightMargin;
                 length = mediaInfo.dotsPrintable[1];
             }
-            const canvas = Canvas.createCanvas(length, width);
+            const canvas = Canvas.createCanvas(length, width + secondaryWidth);
             const ctx = canvas.getContext("2d");
             ctx.globalCompositeOperation = "luminosity";
             ctx.textAlign = "center";
@@ -350,6 +355,19 @@ class Printer {
             else {
                 ctx.font = `${primaryFontSize}px "${this.font}"`;
                 ctx.fillText(primary, length / 2, width / 2);
+            }
+            if (secondRowImagePath && status.media.width === 12) {
+                // Draw image on second label tape
+                const image = yield Canvas.loadImage(secondRowImagePath);
+                const topMargin = 15;
+                const ratio = image.width / image.height;
+                let newWidth = length;
+                let newHeight = newWidth / ratio;
+                if (newHeight > secondaryWidth - topMargin) {
+                    newHeight = secondaryWidth - topMargin;
+                    newWidth = newHeight * ratio;
+                }
+                ctx.drawImage(image, (length - newWidth) / 2, width + topMargin, newWidth, newHeight);
             }
             if (this.debugMode) {
                 try {

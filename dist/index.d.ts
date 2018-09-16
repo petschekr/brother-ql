@@ -40,5 +40,5 @@ export declare class Printer {
     rawImageToRasterLines(render: Buffer, width: number): Promise<Buffer[]>;
     private font;
     useFont(name: string, path?: string): void;
-    rasterizeText(primary: string, secondary?: string): Promise<Buffer[]>;
+    rasterizeText(primary: string, secondary?: string, secondRowImagePath?: string): Promise<Buffer[]>;
 }
