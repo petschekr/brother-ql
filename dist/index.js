@@ -52,7 +52,7 @@ class Printer {
             throw new Error("Couldn't find a compatible printer");
         printer.open();
         this.printerInterface = printer.interface(0);
-        if (this.printerInterface.isKernelDriverActive()) {
+        if (["linux", "darwin"].includes(process.platform) && this.printerInterface.isKernelDriverActive()) {
             this.printerInterface.detachKernelDriver();
         }
         this.printerInterface.claim();

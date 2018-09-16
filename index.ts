@@ -64,7 +64,7 @@ export class Printer {
 
 		printer.open();
 		this.printerInterface = printer.interface(0);
-		if (this.printerInterface.isKernelDriverActive()) {
+		if (["linux", "darwin"].includes(process.platform) && this.printerInterface.isKernelDriverActive()) {
 			this.printerInterface.detachKernelDriver();
 		}
 		this.printerInterface.claim();
