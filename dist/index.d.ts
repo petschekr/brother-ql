@@ -1,4 +1,5 @@
 /// <reference types="node" />
+import * as usb from "usb";
 export declare enum MediaType {
     None = 0,
     ContinuousTape = 1,
@@ -25,13 +26,14 @@ export declare namespace Status {
     }
 }
 export declare class Printer {
-    readonly debugMode: boolean;
+    readonly debugMode: boolean | "" | undefined;
     private readonly printerInterface;
     private readonly input;
     private readonly output;
     private statusHandlers;
     private removeStatusHandler;
-    constructor(debugMode?: boolean);
+    static getAvailable(): usb.Device[];
+    constructor(deviceAddress?: number);
     init(): Promise<void>;
     private parseStatusResponse;
     private transfer;

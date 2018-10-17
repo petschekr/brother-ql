@@ -30,26 +30,27 @@ var Status;
     })(Type = Status.Type || (Status.Type = {}));
 })(Status = exports.Status || (exports.Status = {}));
 class Printer {
-    constructor(debugMode = false) {
-        this.debugMode = debugMode;
+    constructor(deviceAddress) {
+        this.debugMode = process.env.DEBUG && process.env.DEBUG.toLowerCase() === "true";
         this.input = null;
         this.output = null;
         this.statusHandlers = [];
         this.font = "Arial";
-        const VendorID = 0x04F9;
-        let printer;
-        if (usb.findByIds(VendorID, 0x2049)) {
+        if (usb.findByIds(constants.VendorID, 0x2049)) {
             throw new Error("You must disable Editor Lite mode on your QL-700 before you can use this module");
         }
-        for (let id of constants.USBProductIDs) {
-            let device = usb.findByIds(VendorID, id);
-            if (device) {
-                printer = device;
-                break;
-            }
+        let printers = Printer.getAvailable();
+        if (printers.length === 0)
+            throw new Error("Couldn't find a compatible printer");
+        let printer;
+        if (deviceAddress) {
+            printer = printers.find(printer => printer.deviceAddress === deviceAddress);
+        }
+        else {
+            printer = printers[0];
         }
         if (!printer)
-            throw new Error("Couldn't find a compatible printer");
+            throw new Error(`No compatible printer found with specified address: ${deviceAddress}`);
         printer.open();
         this.printerInterface = printer.interface(0);
         if (["linux", "darwin"].includes(process.platform) && this.printerInterface.isKernelDriverActive()) {
@@ -70,7 +71,7 @@ class Printer {
         this.input.on("data", (data) => {
             if (data.length === 0)
                 return;
-            if (debugMode) {
+            if (this.debugMode) {
                 console.log("Received:", data);
             }
             if (data[0] === 0x80) {
@@ -88,6 +89,9 @@ class Printer {
         else {
             this.statusHandlers.splice(index, 1);
         }
+    }
+    static getAvailable() {
+        return usb.getDeviceList().filter(device => device.deviceDescriptor.idVendor === constants.VendorID && constants.USBProductIDs.includes(device.deviceDescriptor.idProduct));
     }
     init() {
         return __awaiter(this, void 0, void 0, function* () {

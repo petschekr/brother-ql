@@ -33,6 +33,7 @@ export namespace Status {
 }
 
 export class Printer {
+	public readonly debugMode = process.env.DEBUG && process.env.DEBUG.toLowerCase() === "true";
 	private readonly printerInterface: usb.Interface;
 	private readonly input: usb.InEndpoint | null = null;
 	private readonly output: usb.OutEndpoint | null = null;
@@ -48,20 +49,26 @@ export class Printer {
 		}
 	}
 
-	constructor(public readonly debugMode = false) {
-		const VendorID = 0x04F9;
-		let printer: usb.Device | undefined;
-		if (usb.findByIds(VendorID, 0x2049)) {
+	public static getAvailable(): usb.Device[] {
+		return usb.getDeviceList().filter(device => device.deviceDescriptor.idVendor === constants.VendorID && constants.USBProductIDs.includes(device.deviceDescriptor.idProduct));
+	}
+
+	constructor(deviceAddress?: number) {
+		if (usb.findByIds(constants.VendorID, 0x2049)) {
 			throw new Error("You must disable Editor Lite mode on your QL-700 before you can use this module");
 		}
-		for (let id of constants.USBProductIDs) {
-			let device = usb.findByIds(VendorID, id);
-			if (device) {
-				printer = device;
-				break;
-			}
+
+		let printers = Printer.getAvailable();
+		if (printers.length === 0) throw new Error("Couldn't find a compatible printer");
+
+		let printer: usb.Device | undefined;
+		if (deviceAddress) {
+			printer = printers.find(printer => printer.deviceAddress === deviceAddress);
 		}
-		if (!printer) throw new Error("Couldn't find a compatible printer");
+		else {
+			printer = printers[0];
+		}
+		if (!printer) throw new Error(`No compatible printer found with specified address: ${deviceAddress}`);
 
 		printer.open();
 		this.printerInterface = printer.interface(0);
@@ -82,7 +89,7 @@ export class Printer {
 		this.input.startPoll(1, 32);
 		this.input.on("data", (data: Buffer) => {
 			if (data.length === 0) return;
-			if (debugMode) {
+			if (this.debugMode) {
 				console.log("Received:", data);
 			}
 			if (data[0] === 0x80) {

@@ -27,6 +27,7 @@ export const Labels: { [type: string]: Label } = {
 	"62x100": { "tapeSize": [62, 100], "dots": [732, 1179], "dotsPrintable": [696, 1109], "rightMargin": 12, "feedMargin": 0 },
 }
 
+export const VendorID = 0x04F9;
 export const USBProductIDs: number[] = [
 	0x2015, // QL-500
 	0x2016, // QL-550

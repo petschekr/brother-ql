@@ -9,4 +9,5 @@ export interface Label {
 export declare const Labels: {
     [type: string]: Label;
 };
+export declare const VendorID = 1273;
 export declare const USBProductIDs: number[];

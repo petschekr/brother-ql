@@ -1,7 +1,7 @@
 import * as BrotherQL from "../index";
 
 (async () => {
-	const printer = new BrotherQL.Printer(false);
+	const printer = new BrotherQL.Printer();
 	await printer.init();
 
 	printer.useFont("Chicago", __dirname + "/Chicago.ttf");

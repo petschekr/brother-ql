@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const BrotherQL = require("../index");
 (() => __awaiter(this, void 0, void 0, function* () {
-    const printer = new BrotherQL.Printer(false);
+    const printer = new BrotherQL.Printer();
     yield printer.init();
     printer.useFont("Chicago", __dirname + "/Chicago.ttf");
     const lines = yield printer.rasterizeText("Ryan Petschek", "Georgia Institute of Technology", __dirname + "/HackGT.png");

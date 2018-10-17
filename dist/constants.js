@@ -19,6 +19,7 @@ exports.Labels = {
     "62x29": { "tapeSize": [62, 29], "dots": [732, 341], "dotsPrintable": [696, 271], "rightMargin": 12, "feedMargin": 0 },
     "62x100": { "tapeSize": [62, 100], "dots": [732, 1179], "dotsPrintable": [696, 1109], "rightMargin": 12, "feedMargin": 0 },
 };
+exports.VendorID = 0x04F9;
 exports.USBProductIDs = [
     0x2015,
     0x2016,
