@@ -34,6 +34,8 @@ export declare class Printer {
     private removeStatusHandler;
     static getAvailable(): usb.Device[];
     constructor(deviceAddress?: number);
+    private errorHandlers;
+    attachErrorHandler(handler: (err: Error) => void): void;
     init(): Promise<void>;
     private parseStatusResponse;
     private transfer;

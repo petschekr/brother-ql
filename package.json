@@ -1,6 +1,6 @@
 {
   "name": "brother-ql",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "description": "Library for interfacing with Brother QL series label printers",
   "main": "dist/index.js",
   "scripts": {

@@ -79,9 +79,19 @@ export class Printer {
 		for (let endpoint of this.printerInterface.endpoints) {
 			if (endpoint.direction === "in") {
 				this.input = endpoint as usb.InEndpoint;
+				this.input.on("error", err => {
+					this.errorHandlers.forEach(handler => {
+						handler(err);
+					});
+				});
 			}
 			else if (endpoint.direction === "out") {
 				this.output = endpoint as usb.OutEndpoint;
+				this.output.on("error", err => {
+					this.errorHandlers.forEach(handler => {
+						handler(err);
+					});
+				});
 			}
 		}
 		if (!this.input || !this.output) throw new Error("Input/output endpoints not found");
@@ -98,6 +108,11 @@ export class Printer {
 				}
 			}
 		});
+	}
+
+	private errorHandlers: ((err: Error) => void)[] = [];
+	public attachErrorHandler(handler: (err: Error) => void) {
+		this.errorHandlers.push(handler);
 	}
 
 	public async init() {

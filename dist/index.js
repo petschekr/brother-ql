@@ -35,6 +35,7 @@ class Printer {
         this.input = null;
         this.output = null;
         this.statusHandlers = [];
+        this.errorHandlers = [];
         this.font = "Arial";
         if (usb.findByIds(constants.VendorID, 0x2049)) {
             throw new Error("You must disable Editor Lite mode on your QL-700 before you can use this module");
@@ -60,9 +61,19 @@ class Printer {
         for (let endpoint of this.printerInterface.endpoints) {
             if (endpoint.direction === "in") {
                 this.input = endpoint;
+                this.input.on("error", err => {
+                    this.errorHandlers.forEach(handler => {
+                        handler(err);
+                    });
+                });
             }
             else if (endpoint.direction === "out") {
                 this.output = endpoint;
+                this.output.on("error", err => {
+                    this.errorHandlers.forEach(handler => {
+                        handler(err);
+                    });
+                });
             }
         }
         if (!this.input || !this.output)
@@ -92,6 +103,9 @@ class Printer {
     }
     static getAvailable() {
         return usb.getDeviceList().filter(device => device.deviceDescriptor.idVendor === constants.VendorID && constants.USBProductIDs.includes(device.deviceDescriptor.idProduct));
+    }
+    attachErrorHandler(handler) {
+        this.errorHandlers.push(handler);
     }
     init() {
         return __awaiter(this, void 0, void 0, function* () {
