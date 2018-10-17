@@ -312,11 +312,11 @@ export class Printer {
 		this.font = name;
 	}
 
-	async rasterizeText(primary: string, secondary?: string, secondRowImagePath?: string): Promise<Buffer[]> {
+	async rasterizeText(primary: string, secondary?: string, secondRowImagePath?: string, defaultLength: number = 750): Promise<Buffer[]> {
 		let status = await this.getStatus();
 		let width = 0;
 		let secondaryWidth = 0;
-		let length = 750; // Default
+		let length = defaultLength;
 
 		if (status.media.type === MediaType.ContinuousTape) {
 			let mediaInfo = constants.Labels[status.media.width.toString()];

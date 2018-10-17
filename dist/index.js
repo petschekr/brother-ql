@@ -294,12 +294,12 @@ class Printer {
         }
         this.font = name;
     }
-    rasterizeText(primary, secondary, secondRowImagePath) {
+    rasterizeText(primary, secondary, secondRowImagePath, defaultLength = 750) {
         return __awaiter(this, void 0, void 0, function* () {
             let status = yield this.getStatus();
             let width = 0;
             let secondaryWidth = 0;
-            let length = 750; // Default
+            let length = defaultLength;
             if (status.media.type === MediaType.ContinuousTape) {
                 let mediaInfo = constants.Labels[status.media.width.toString()];
                 if (!mediaInfo)
